@@ -9,31 +9,42 @@ Use it when you want to:
 - identify reusable components early
 - preserve shared decisions across pages
 
-## Get Started
+## Installation
 
-1. Clone this repo.
-2. Pick or create a target workspace for your Shopify theme work.
-3. Scaffold the workspace:
+Install this skill through Codex with `$skill-installer`.
 
-```bash
-python scripts/scaffold_workspace.py <target-dir>
-```
+Example:
 
-4. If you already know your first page slug, scaffold that too:
+- `Use $skill-installer to install the skill from https://github.com/SeanCole02/image2shop.`
 
-```bash
-python scripts/scaffold_workspace.py <target-dir> --page-slug homepage
-```
+After installation, restart Codex so the new skill is discovered.
 
-5. Put your Framer exports or screenshots into:
+## Use With Codex
+
+The normal way to use this repo is to ask Codex to use `$image2shop`.
+
+Examples:
+
+- `Use $image2shop to initialize a Shopify theme workspace in <target-dir>.`
+- `Use $image2shop to initialize a workspace in <target-dir> and scaffold the page slug homepage.`
+- `Use $image2shop to review these Framer mockups, update specs/theme-system.md and THEME_MEMORY.md, and scaffold the next page.`
+
+## First Workflow
+
+1. Make the skill available to Codex.
+2. Restart Codex if you just installed the skill.
+3. Ask Codex to use `$image2shop` to initialize your workspace.
+4. Add your Framer exports or screenshots to:
    - `design-assets/mockups/<page-slug>/desktop/`
    - `design-assets/mockups/<page-slug>/mobile/`
-6. Define the shared storefront in `specs/theme-system.md`.
-7. Record reusable component decisions in `THEME_MEMORY.md`.
-8. Fill out `specs/pages/<page-slug>.md`.
-9. Build the approved Shopify output under `theme/`.
+5. Ask Codex to update:
+   - `specs/theme-system.md`
+   - `THEME_MEMORY.md`
+   - `specs/pages/<page-slug>.md`
+6. Ask Codex to map the design into Shopify templates, sections, snippets, and settings.
+7. Ask Codex to implement the approved output under `theme/`.
 
-## What Gets Generated
+## What Codex Creates
 
 The scaffolded workspace has three main areas:
 
@@ -44,16 +55,7 @@ The scaffolded workspace has three main areas:
 It also creates:
 
 - `specs/theme-system.md` for shared storefront structure
-- `THEME_MEMORY.md` for reusable-component memory
-
-## Typical Workflow
-
-1. Define navigation, footer, routes, template families, and shared sections in `specs/theme-system.md`.
-2. Add reusable component candidates to `THEME_MEMORY.md`.
-3. Create or update the page spec for the current page.
-4. Ask clarifying questions before implementation if anything is ambiguous.
-5. Promote components when they are clearly global or reused across pages.
-6. Implement the resulting Liquid sections, snippets, templates, and settings.
+- `THEME_MEMORY.md` for shared decisions and reusable components
 
 ## Reusable Component Rules
 
@@ -72,6 +74,20 @@ Promote a candidate:
 - after reuse on 2 or more pages with materially matching structure and behavior
 
 Keep it as a candidate if reuse is likely but scope or behavior is still unclear.
+
+## Manual Fallback
+
+If you want to initialize a workspace directly instead of asking Codex, use:
+
+```bash
+python scripts/scaffold_workspace.py <target-dir>
+```
+
+To scaffold the first page at the same time:
+
+```bash
+python scripts/scaffold_workspace.py <target-dir> --page-slug homepage
+```
 
 ## Repository Layout
 
