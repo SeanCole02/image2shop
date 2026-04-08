@@ -108,6 +108,16 @@ def main() -> int:
         print(f"[INFO] Skipped {len(skipped)} existing file(s)")
     if args.page_slug:
         print(f"[OK] Prepared page slug: {args.page_slug}")
+    print("[NEXT] Put shared colors and theme tokens in specs/tokens/theme-tokens.json")
+    print("[NEXT] Put shared navigation, footer, routes, and template structure in specs/theme-system.md")
+    print("[NEXT] Put reusable component decisions in THEME_MEMORY.md")
+    if args.page_slug:
+        print(f"[NEXT] Put desktop mockups in design-assets/mockups/{args.page_slug}/desktop/")
+        print(f"[NEXT] Put mobile mockups in design-assets/mockups/{args.page_slug}/mobile/")
+    else:
+        print("[NEXT] Choose a lowercase hyphenated page slug such as homepage or product-detail")
+        print("[NEXT] Then put desktop and mobile mockups in design-assets/mockups/<page-slug>/desktop/ and mobile/")
+    print("[NEXT] Fill out the matching page spec in specs/pages/<page-slug>.md after the mockups are in place")
 
     return 0
 

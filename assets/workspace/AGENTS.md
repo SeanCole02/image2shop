@@ -25,6 +25,7 @@ Agents working in this repository must follow these rules:
 - Keep the theme coherent across pages instead of treating each page as an isolated conversion.
 - Mark reusable component candidates immediately and update `THEME_MEMORY.md`.
 - Promote candidates once they are clearly global or reused across multiple pages.
+- After creating the workspace, tell the user in plain language where to put shared colors, page slugs, and mockups, and explain why each belongs there.
 
 ## Design-to-Code Workflow
 

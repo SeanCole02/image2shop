@@ -66,6 +66,26 @@ Examples:
 6. Ask Codex to map the design into Shopify templates, sections, snippets, and settings.
 7. Ask Codex to implement the approved output under `theme/`.
 
+## After Initialization
+
+After the workspace is created, the next inputs should go here:
+
+- shared colors and design tokens:
+  put them in `specs/tokens/theme-tokens.json`
+  because they should stay consistent across the whole theme
+- page slug:
+  use a lowercase hyphenated name like `homepage` or `product-detail`
+  because the slug names the page spec and the mockup folders
+- desktop and mobile mockups:
+  put them in `design-assets/mockups/<page-slug>/desktop/` and `design-assets/mockups/<page-slug>/mobile/`
+  because the page spec and implementation should point to those exact files
+- shared storefront structure:
+  put it in `specs/theme-system.md`
+  because navigation, footer, routes, and template families should be decided across pages
+- reusable component decisions:
+  put them in `THEME_MEMORY.md`
+  because repeated cards, snippets, and layouts should be tracked before pages drift apart
+
 ## What Codex Creates
 
 The scaffolded workspace has three main areas:

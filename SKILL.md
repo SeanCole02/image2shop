@@ -21,6 +21,7 @@ Treat Framer files and exported mockups as design inputs, not deployable code.
 - Promote candidates once they meet the shared-component rules in `THEME_MEMORY.md`.
 - Keep raw or reference mockups out of `theme/assets/` until they are intentionally prepared as production assets.
 - Do not begin theme implementation for a page until its intake file, mockup references, and unresolved questions are recorded.
+- After workspace initialization, tell the user exactly where to put colors, page slugs, and mockups, and explain why each location exists.
 
 ## Quick Start
 
@@ -38,14 +39,16 @@ Treat Framer files and exported mockups as design inputs, not deployable code.
 1. Create or verify the workspace structure.
 2. Define the shared theme system in `specs/theme-system.md`.
 3. Initialize or update `THEME_MEMORY.md`.
-4. Create the page spec and mockup folders.
-5. Ask questions and record unknowns before implementation.
-6. Mark likely reusable sections, snippets, cards, and patterns immediately.
-7. Lock design tokens only when the design values are clear.
-8. Map design regions into templates, sections, blocks, snippets, settings, and app blocks.
-9. Link the page back to shared navigation, footer, templates, and reusable section inventory.
-10. Implement the approved output in `theme/`.
-11. Review visual parity, responsive behavior, and merchant editability.
+4. Tell the user where to put shared colors in `specs/tokens/theme-tokens.json`.
+5. Tell the user how to choose a page slug and where its mockups should go.
+6. Create the page spec and mockup folders.
+7. Ask questions and record unknowns before implementation.
+8. Mark likely reusable sections, snippets, cards, and patterns immediately.
+9. Lock design tokens only when the design values are clear.
+10. Map design regions into templates, sections, blocks, snippets, settings, and app blocks.
+11. Link the page back to shared navigation, footer, templates, and reusable section inventory.
+12. Implement the approved output in `theme/`.
+13. Review visual parity, responsive behavior, and merchant editability.
 
 ## Bundled Resources
 
