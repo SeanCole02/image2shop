@@ -5,6 +5,9 @@
 `Source:`
 `Framer URL:`
 `Business goal:`
+`Primary user task:`
+`Primary CTA:`
+`UX success criteria:`
 `Shopify page type:`
 `Spec path:`
 `Mockup folder:`
@@ -26,3 +29,7 @@
 `Theme tokens touched:`
 `Unknowns:`
 `Suggested implementation path:`
+`UX review notes:`
+`UX review result:`
+
+Use `pass`, `needs-rework`, or `fail` for `UX review result`.

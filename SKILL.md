@@ -22,10 +22,18 @@ Treat Framer files and exported mockups as design inputs, not deployable code.
 - Keep raw or reference mockups out of `theme/assets/` until they are intentionally prepared as production assets.
 - Do not begin theme implementation for a page until its intake file, mockup references, and unresolved questions are recorded.
 - After workspace initialization, tell the user exactly where to put colors, page slugs, and mockups, and explain why each location exists.
+- If the user has a brand-guidelines PDF, tell them to place it in `design-assets/raw/` and extract tokens from it before page styling begins.
+- Let the extractor add extra brand-specific token fields when the brand document defines roles beyond the base token schema.
+- Review generated themes for human-focused UX based on the page's actual job, not only visual parity.
+- Check that hierarchy, CTA placement, scannability, trust cues, and interaction friction support the page's feature and user intent.
+- Run `python scripts/validate_page_spec.py specs/pages/<page-slug>.md --stage pre-implement` before implementation starts.
+- Run `python scripts/validate_page_spec.py specs/pages/<page-slug>.md --stage pre-complete` before treating a page as complete.
 
 ## Quick Start
 
 - Run `python scripts/scaffold_workspace.py <target-dir>` to scaffold or normalize a workspace.
+- Run `python scripts/extract_brand_guidelines.py <source> --tokens <theme-tokens-path>` when the user provides a brand-guidelines PDF or text document.
+- Run `python scripts/validate_page_spec.py specs/pages/<page-slug>.md --stage <pre-implement|pre-complete>` to enforce intake and UX-review gates.
 - Run `python scripts/update_installed_skill.py` when the user asks to update the installed skill.
 - Add `--page-slug <slug>` to scaffold a page at the same time.
 - Read `references/repo-structure.md` for folder conventions.
@@ -40,19 +48,26 @@ Treat Framer files and exported mockups as design inputs, not deployable code.
 2. Define the shared theme system in `specs/theme-system.md`.
 3. Initialize or update `THEME_MEMORY.md`.
 4. Tell the user where to put shared colors in `specs/tokens/theme-tokens.json`.
-5. Tell the user how to choose a page slug and where its mockups should go.
-6. Create the page spec and mockup folders.
-7. Ask questions and record unknowns before implementation.
-8. Mark likely reusable sections, snippets, cards, and patterns immediately.
-9. Lock design tokens only when the design values are clear.
-10. Map design regions into templates, sections, blocks, snippets, settings, and app blocks.
-11. Link the page back to shared navigation, footer, templates, and reusable section inventory.
-12. Implement the approved output in `theme/`.
-13. Review visual parity, responsive behavior, and merchant editability.
+5. If available, extract brand-guidelines data into the token file before styling pages.
+6. Let the extractor populate `colors_additional` and `typography_additional` when the brand document defines named roles outside the default token schema.
+7. Tell the user how to choose a page slug and where its mockups should go.
+8. Create the page spec and mockup folders.
+9. Ask questions and record unknowns before implementation.
+10. Mark likely reusable sections, snippets, cards, and patterns immediately.
+11. Lock design tokens only when the design values are clear.
+12. Map design regions into templates, sections, blocks, snippets, settings, and app blocks.
+13. Run `python scripts/validate_page_spec.py specs/pages/<page-slug>.md --stage pre-implement`.
+14. Link the page back to shared navigation, footer, templates, and reusable section inventory.
+15. Implement the approved output in `theme/`.
+16. Review visual parity, responsive behavior, merchant editability, and whether the UI/UX serves the page's primary human goal.
+17. Record `UX review notes` and `UX review result` in the page spec, using `pass`, `needs-rework`, or `fail` for the result.
+18. Run `python scripts/validate_page_spec.py specs/pages/<page-slug>.md --stage pre-complete`.
 
 ## Bundled Resources
 
 - Use `scripts/scaffold_workspace.py` for deterministic workspace setup.
+- Use `scripts/extract_brand_guidelines.py` to merge brand-guidelines data into theme tokens.
+- Use `scripts/validate_page_spec.py` to enforce page-spec and UX-review gates.
 - Use `scripts/update_installed_skill.py` to update an installed copy in place.
 - Use `assets/workspace/` for scaffolded repo files.
 - Use `assets/templates/theme-system-template.md` for the shared theme plan.
@@ -63,6 +78,7 @@ Treat Framer files and exported mockups as design inputs, not deployable code.
 ## Reference Files
 
 - `references/repo-structure.md`
+- `references/brand-guidelines.md`
 - `references/theme-system.md`
 - `references/theme-memory.md`
 - `references/intake-workflow.md`

@@ -55,6 +55,8 @@ QA checklist:
 - consistency with the shared theme system
 - consistency with `THEME_MEMORY.md`
 - visual parity against the mockup
+- support for the page's primary user task and CTA
+- clear hierarchy, scannability, trust cues, and acceptable interaction friction for that page
 - desktop and mobile behavior
 - empty states
 - overflow handling

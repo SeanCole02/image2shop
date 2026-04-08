@@ -12,10 +12,13 @@ Persistent shared memory belongs in `THEME_MEMORY.md`.
 After initialization:
 
 - put shared colors, typography, spacing, and related tokens in `specs/tokens/theme-tokens.json`
+- if you have a brand-guidelines PDF, put it in `design-assets/raw/` and extract tokens from it first
 - use a lowercase hyphenated page slug like `homepage` or `product-detail`
 - put page mockups in `design-assets/mockups/<page-slug>/desktop/` and `design-assets/mockups/<page-slug>/mobile/`
+- put the page's user goal, primary CTA, UX success criteria, and final UX review in `specs/pages/<page-slug>.md`
 - record cross-page structure in `specs/theme-system.md`
 - record reusable component decisions in `THEME_MEMORY.md`
+- review generated pages against their primary user task and CTA, not only against the source mockup
 
 Rules:
 

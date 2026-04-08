@@ -8,6 +8,7 @@ Use it when you want to:
 - keep pages connected inside one theme system
 - identify reusable components early
 - preserve shared decisions across pages
+- review generated pages against human goals, not only design fidelity
 
 ## Installation
 
@@ -50,15 +51,17 @@ Examples:
 1. Make the skill available to Codex.
 2. Restart Codex if you just installed the skill.
 3. Ask Codex to use `$image2shop` to initialize your workspace.
-4. Add your Framer exports or screenshots to:
+4. If you have a brand-guidelines PDF, put it in `design-assets/raw/` and ask Codex to extract shared tokens from it.
+5. Add your Framer exports or screenshots to:
    - `design-assets/mockups/<page-slug>/desktop/`
    - `design-assets/mockups/<page-slug>/mobile/`
-5. Ask Codex to update:
+6. Ask Codex to update:
    - `specs/theme-system.md`
    - `THEME_MEMORY.md`
    - `specs/pages/<page-slug>.md`
-6. Ask Codex to map the design into Shopify templates, sections, snippets, and settings.
-7. Ask Codex to implement the approved output under `theme/`.
+7. Ask Codex to map the design into Shopify templates, sections, snippets, and settings.
+8. Ask Codex to implement the approved output under `theme/`.
+9. Ask Codex to review the generated page for human-focused UX based on that page's purpose, CTA, and user task.
 
 ## After Initialization
 
@@ -67,9 +70,15 @@ After the workspace is created, the next inputs should go here:
 - shared colors and design tokens:
   put them in `specs/tokens/theme-tokens.json`
   because they should stay consistent across the whole theme
+- extra brand-specific color or type roles discovered from guidelines:
+  let Codex add them in `specs/tokens/theme-tokens.json` under `colors_additional` and `typography_additional`
+  because those values often exist in a brand document even when the base token schema does not include them yet
 - page slug:
   use a lowercase hyphenated name like `homepage` or `product-detail`
   because the slug names the page spec and the mockup folders
+- page goal and UX review fields:
+  put the page's primary user task, primary CTA, UX success criteria, `UX review notes`, and `UX review result` in `specs/pages/<page-slug>.md`
+  because implementation and final review are now gated against those fields
 - desktop and mobile mockups:
   put them in `design-assets/mockups/<page-slug>/desktop/` and `design-assets/mockups/<page-slug>/mobile/`
   because the page spec and implementation should point to those exact files
@@ -79,6 +88,9 @@ After the workspace is created, the next inputs should go here:
 - reusable component decisions:
   put them in `THEME_MEMORY.md`
   because repeated cards, snippets, and layouts should be tracked before pages drift apart
+- brand-guidelines PDF:
+  put it in `design-assets/raw/`
+  because shared colors, fonts, and other brand rules should update theme tokens before page styling starts
 
 ## What Codex Creates
 
@@ -92,6 +104,7 @@ It also creates:
 
 - `specs/theme-system.md` for shared storefront structure
 - `THEME_MEMORY.md` for shared decisions and reusable components
+- `design-assets/raw/` for original brand and design-source files
 
 ## Reusable Component Rules
 
@@ -124,6 +137,28 @@ To scaffold the first page at the same time:
 ```bash
 python scripts/scaffold_workspace.py <target-dir> --page-slug homepage
 ```
+
+To extract tokens from a brand-guidelines document:
+
+```bash
+python scripts/extract_brand_guidelines.py design-assets/raw/brand-guidelines.pdf --tokens specs/tokens/theme-tokens.json
+```
+
+The extractor updates the standard `colors` and `typography` sections first, then records any extra named brand roles in `colors_additional` and `typography_additional`.
+
+To validate a page spec before implementation:
+
+```bash
+python scripts/validate_page_spec.py specs/pages/homepage.md --stage pre-implement
+```
+
+To validate that UX review has been recorded before treating a page as complete:
+
+```bash
+python scripts/validate_page_spec.py specs/pages/homepage.md --stage pre-complete
+```
+
+Use `pass`, `needs-rework`, or `fail` for `UX review result`.
 
 ## Repository Layout
 

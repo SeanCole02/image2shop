@@ -20,11 +20,13 @@
     "warning": "#B7791F",
     "error": "#C53030"
   },
+  "colors_additional": {},
   "typography": {
     "font_heading": "Replace with approved heading font",
     "font_body": "Replace with approved body font",
     "base_font_size_px": 16
   },
+  "typography_additional": {},
   "spacing": {
     "section_gap_px": 80,
     "container_padding_px": 24,

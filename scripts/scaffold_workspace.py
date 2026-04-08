@@ -70,6 +70,23 @@ def ensure_page_scaffold(skill_root: Path, target_root: Path, page_slug: str, fo
     return written, skipped
 
 
+def ensure_workspace_script(skill_root: Path, target_root: Path, relative_path: str, force: bool) -> tuple[list[Path], list[Path]]:
+    written: list[Path] = []
+    skipped: list[Path] = []
+
+    source = skill_root / relative_path
+    destination = target_root / relative_path
+    destination.parent.mkdir(parents=True, exist_ok=True)
+
+    if destination.exists() and not force:
+        skipped.append(destination)
+    else:
+        shutil.copyfile(source, destination)
+        written.append(destination)
+
+    return written, skipped
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Scaffold a Framer-to-Shopify workspace.")
     parser.add_argument("target_dir", help="Target directory for the workspace.")
@@ -97,6 +114,15 @@ def main() -> int:
         shutil.copyfile(token_template, token_target)
         written.append(token_target)
 
+    script_written, script_skipped = ensure_workspace_script(
+        skill_root,
+        target_root,
+        "scripts/validate_page_spec.py",
+        args.force,
+    )
+    written.extend(script_written)
+    skipped.extend(script_skipped)
+
     if args.page_slug:
         page_written, page_skipped = ensure_page_scaffold(skill_root, target_root, args.page_slug, args.force)
         written.extend(page_written)
@@ -109,15 +135,17 @@ def main() -> int:
     if args.page_slug:
         print(f"[OK] Prepared page slug: {args.page_slug}")
     print("[NEXT] Put shared colors and theme tokens in specs/tokens/theme-tokens.json")
+    print("[NEXT] If you have a brand-guidelines PDF, put it in design-assets/raw/ and extract tokens from it before styling pages")
     print("[NEXT] Put shared navigation, footer, routes, and template structure in specs/theme-system.md")
     print("[NEXT] Put reusable component decisions in THEME_MEMORY.md")
     if args.page_slug:
         print(f"[NEXT] Put desktop mockups in design-assets/mockups/{args.page_slug}/desktop/")
         print(f"[NEXT] Put mobile mockups in design-assets/mockups/{args.page_slug}/mobile/")
+        print(f"[NEXT] Fill out the matching page spec in specs/pages/{args.page_slug}.md after the mockups are in place")
     else:
         print("[NEXT] Choose a lowercase hyphenated page slug such as homepage or product-detail")
         print("[NEXT] Then put desktop and mobile mockups in design-assets/mockups/<page-slug>/desktop/ and mobile/")
-    print("[NEXT] Fill out the matching page spec in specs/pages/<page-slug>.md after the mockups are in place")
+        print("[NEXT] Fill out the matching page spec in specs/pages/<page-slug>.md after the mockups are in place")
 
     return 0
 
