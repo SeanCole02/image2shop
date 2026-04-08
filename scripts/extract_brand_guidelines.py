@@ -6,6 +6,7 @@ Extract brand-guidelines data from a PDF or text file and merge it into theme to
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import json
 import re
 import shutil
@@ -14,6 +15,7 @@ import tempfile
 from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Any
 
 HEX_RE = re.compile(r"#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})\b")
 ROLE_PATTERNS = {
@@ -47,6 +49,8 @@ LINE_WITH_HEX_RE = re.compile(r"^(?P<label>[^#\n]{1,120}?)\s+(?P<hex>#(?:[0-9a-f
 NON_ALNUM_RE = re.compile(r"[^a-z0-9]+")
 PX_RE = re.compile(r"\b(\d{1,3})\s*px\b", re.I)
 PT_RE = re.compile(r"\b(\d{1,3}(?:\.\d+)?)\s*pt\b", re.I)
+OCR_LANGUAGES = ["en"]
+AUTO_TEXT_SCORE_THRESHOLD = 6
 
 
 def parse_args() -> argparse.Namespace:
@@ -58,6 +62,12 @@ def parse_args() -> argparse.Namespace:
         "--tokens",
         default="specs/tokens/theme-tokens.json",
         help="Path to the theme tokens file to update.",
+    )
+    parser.add_argument(
+        "--mode",
+        choices=("auto", "text", "ocr"),
+        default="auto",
+        help="Extraction mode. `auto` tries text first, then OCR if needed.",
     )
     parser.add_argument("--dry-run", action="store_true", help="Print the merged tokens instead of writing them.")
     return parser.parse_args()
@@ -75,16 +85,30 @@ def slugify_token_key(value: str) -> str:
     return normalized[:48] or "unnamed"
 
 
-def read_source_text(source: Path) -> str:
+def text_backend_available() -> bool:
+    return bool(shutil.which("pdftotext"))
+
+
+def ocr_backend_available() -> bool:
+    return bool(shutil.which("pdftoppm")) and bool(importlib.util.find_spec("easyocr"))
+
+
+def read_text_source(source: Path) -> dict[str, Any]:
     suffix = source.suffix.lower()
     if suffix in {".txt", ".md"}:
-        return source.read_text(encoding="utf-8")
-    if suffix != ".pdf":
-        raise SystemExit("[ERROR] Supported source types are .pdf, .txt, and .md")
+        return {
+            "text": source.read_text(encoding="utf-8"),
+            "method": "text-file",
+            "candidate_scores": {},
+            "fallback_used": False,
+        }
+    raise SystemExit("[ERROR] Supported text source types are .txt and .md")
 
+
+def read_pdf_text(source: Path) -> str:
     pdftotext = shutil.which("pdftotext")
     if not pdftotext:
-        raise SystemExit("[ERROR] pdftotext is not available in PATH")
+        raise RuntimeError("pdftotext is not available in PATH")
 
     with tempfile.TemporaryDirectory() as temp_dir:
         output = Path(temp_dir) / "guidelines.txt"
@@ -92,8 +116,185 @@ def read_source_text(source: Path) -> str:
         result = subprocess.run(cmd, capture_output=True, text=True)
         if result.returncode != 0:
             stderr = result.stderr.strip() or result.stdout.strip() or "unknown pdftotext error"
-            raise SystemExit(f"[ERROR] Failed to extract text from PDF: {stderr}")
+            raise RuntimeError(f"Failed to extract text from PDF: {stderr}")
         return output.read_text(encoding="utf-8", errors="replace")
+
+
+def render_pdf_pages(source: Path, temp_dir: Path) -> list[Path]:
+    pdftoppm = shutil.which("pdftoppm")
+    if not pdftoppm:
+        raise RuntimeError("pdftoppm is not available in PATH")
+
+    prefix = temp_dir / "page"
+    cmd = [pdftoppm, "-png", "-r", "200", str(source), str(prefix)]
+    result = subprocess.run(cmd, capture_output=True, text=True)
+    if result.returncode != 0:
+        stderr = result.stderr.strip() or result.stdout.strip() or "unknown pdftoppm error"
+        raise RuntimeError(f"Failed to rasterize PDF for OCR: {stderr}")
+    return sorted(temp_dir.glob("page-*.png"))
+
+
+def read_pdf_ocr(source: Path) -> str:
+    try:
+        import easyocr  # type: ignore
+    except ImportError as exc:  # pragma: no cover - environment dependent
+        raise RuntimeError("easyocr is not installed") from exc
+
+    with tempfile.TemporaryDirectory() as temp_dir:
+        image_paths = render_pdf_pages(source, Path(temp_dir))
+        if not image_paths:
+            raise RuntimeError("No PDF pages were rendered for OCR")
+
+        reader = easyocr.Reader(OCR_LANGUAGES, gpu=False)
+        lines: list[str] = []
+        for image_path in image_paths:
+            page_lines = reader.readtext(str(image_path), detail=0, paragraph=True)
+            lines.extend(item.strip() for item in page_lines if item and item.strip())
+        return "\n".join(lines)
+
+
+def score_extracted_text(text: str) -> int:
+    stripped = text.strip()
+    if not stripped:
+        return 0
+
+    lines = [line for line in text.splitlines() if line.strip()]
+    score = 0
+    score += min(len(stripped) // 250, 6)
+    score += min(len(lines) // 12, 3)
+    score += min(len(HEX_RE.findall(text)), 4)
+    score += min(len(labeled_color_matches(text)), 4)
+    score += min(len(extract_fonts(text)), 2)
+    if extract_base_font_size(text):
+        score += 1
+    return score
+
+
+def read_pdf_source(source: Path, mode: str) -> dict[str, Any]:
+    text_result: dict[str, Any] | None = None
+    ocr_result: dict[str, Any] | None = None
+    warnings: list[str] = []
+    text_error: str | None = None
+    ocr_error: str | None = None
+
+    if mode in {"auto", "text"}:
+        if not text_backend_available():
+            if mode == "text":
+                raise SystemExit("[ERROR] pdftotext is not available in PATH")
+            warnings.append("pdftotext is not available; skipping native PDF text extraction")
+        else:
+            try:
+                text = read_pdf_text(source)
+            except RuntimeError as exc:
+                text_error = str(exc)
+                if mode == "text":
+                    raise SystemExit(f"[ERROR] {exc}")
+                warnings.append(f"Native PDF text extraction failed: {exc}")
+            else:
+                text_result = {
+                    "text": text,
+                    "method": "pdftotext",
+                    "score": score_extracted_text(text),
+                }
+
+    if mode in {"auto", "ocr"}:
+        if not ocr_backend_available():
+            if mode == "ocr":
+                raise SystemExit("[ERROR] OCR mode requires pdftoppm and easyocr")
+            ocr_error = "OCR backend is not available"
+            warnings.append("OCR backend is not available; OCR fallback cannot run")
+        else:
+            try:
+                ocr_text = read_pdf_ocr(source)
+            except RuntimeError as exc:
+                ocr_error = str(exc)
+                if mode == "ocr":
+                    raise SystemExit(f"[ERROR] {exc}")
+                warnings.append(f"OCR extraction failed: {exc}")
+            else:
+                ocr_result = {
+                    "text": ocr_text,
+                    "method": "ocr",
+                    "score": score_extracted_text(ocr_text),
+                }
+
+    if mode == "text":
+        if not text_result:
+            raise SystemExit("[ERROR] PDF text extraction is not available")
+        return {
+            "text": text_result["text"],
+            "method": text_result["method"],
+            "candidate_scores": {"text": text_result["score"]},
+            "fallback_used": False,
+            "warnings": warnings,
+        }
+
+    if mode == "ocr":
+        if not ocr_result:
+            raise SystemExit("[ERROR] OCR extraction is not available")
+        return {
+            "text": ocr_result["text"],
+            "method": ocr_result["method"],
+            "candidate_scores": {"ocr": ocr_result["score"]},
+            "fallback_used": False,
+            "warnings": warnings,
+        }
+
+    candidate_scores: dict[str, int] = {}
+    if text_result:
+        candidate_scores["text"] = text_result["score"]
+    if ocr_result:
+        candidate_scores["ocr"] = ocr_result["score"]
+
+    if text_result and text_result["score"] >= AUTO_TEXT_SCORE_THRESHOLD:
+        return {
+            "text": text_result["text"],
+            "method": text_result["method"],
+            "candidate_scores": candidate_scores,
+            "fallback_used": False,
+            "warnings": warnings,
+        }
+
+    if ocr_result and (not text_result or ocr_result["score"] > text_result["score"]):
+        return {
+            "text": ocr_result["text"],
+            "method": ocr_result["method"],
+            "candidate_scores": candidate_scores,
+            "fallback_used": bool(text_result),
+            "warnings": warnings,
+        }
+
+    if text_result:
+        if text_result["score"] < AUTO_TEXT_SCORE_THRESHOLD:
+            if ocr_error:
+                warnings.append(
+                    f"Using weak native PDF text extraction because OCR fallback did not succeed: {ocr_error}"
+                )
+            else:
+                warnings.append(
+                    "Using weak native PDF text extraction because OCR fallback was not available"
+                )
+        return {
+            "text": text_result["text"],
+            "method": text_result["method"],
+            "candidate_scores": candidate_scores,
+            "fallback_used": False,
+            "warnings": warnings,
+        }
+
+    error_parts = [item for item in (text_error, ocr_error) if item]
+    if error_parts:
+        raise SystemExit("[ERROR] No usable extraction backend is available for this PDF: " + " | ".join(error_parts))
+    raise SystemExit("[ERROR] No usable extraction backend is available for this PDF")
+
+
+def read_source_text(source: Path, mode: str) -> dict[str, Any]:
+    suffix = source.suffix.lower()
+    if suffix in {".txt", ".md"}:
+        return read_text_source(source)
+    if suffix == ".pdf":
+        return read_pdf_source(source, mode)
+    raise SystemExit("[ERROR] Supported source types are .pdf, .txt, and .md")
 
 
 def labeled_color_matches(text: str) -> dict[str, str]:
@@ -148,8 +349,14 @@ def extract_font_from_lines(lines: list[str], labels: tuple[str, ...]) -> str | 
             continue
         if not any(keyword in lowered for keyword in ("font", "typeface", "typography", "type style", "type-style", "type")):
             continue
+        cleaned_line = re.sub(
+            r"\b(heading|headline|display|title|body|paragraph|copy|text|font|fonts|type|typeface|typography)\b",
+            " ",
+            line,
+            flags=re.I,
+        )
         candidates = [
-            item for item in FONT_CANDIDATE_RE.findall(line)
+            item for item in FONT_CANDIDATE_RE.findall(cleaned_line)
             if item.lower() not in {"font", "fonts", "type", "typeface", "primary", "secondary", "body", "heading", "headline"}
         ]
         if candidates:
@@ -226,7 +433,7 @@ def ensure_sections(tokens: dict) -> None:
     tokens.setdefault("brand_guidelines", {})
 
 
-def merge_extracted_data(tokens: dict, source: Path, text: str) -> dict:
+def merge_extracted_data(tokens: dict, source: Path, text: str, extraction: dict[str, Any]) -> dict:
     ensure_sections(tokens)
     colors = labeled_color_matches(text)
     color_extras = additional_color_matches(text, colors)
@@ -255,6 +462,10 @@ def merge_extracted_data(tokens: dict, source: Path, text: str) -> dict:
     guidelines["source_file"] = str(source)
     guidelines["source_type"] = source.suffix.lower().lstrip(".")
     guidelines["extracted_at_utc"] = datetime.now(timezone.utc).isoformat()
+    guidelines["extraction_method"] = extraction["method"]
+    guidelines["candidate_scores"] = extraction.get("candidate_scores", {})
+    guidelines["ocr_fallback_used"] = extraction.get("fallback_used", False)
+    guidelines["extraction_warnings"] = extraction.get("warnings", [])
     guidelines["colors_found"] = len(palette)
     guidelines["fonts_found"] = len(tokens["typography"].get("extracted_families", []))
     guidelines["additional_color_fields"] = sorted(color_extras.keys())
@@ -282,9 +493,9 @@ def main() -> int:
     if not source.exists():
         raise SystemExit(f"[ERROR] Source file not found: {source}")
 
-    text = read_source_text(source)
+    extraction = read_source_text(source, args.mode)
     tokens = load_tokens(tokens_path)
-    result = merge_extracted_data(tokens, source, text)
+    result = merge_extracted_data(tokens, source, extraction["text"], extraction)
 
     if args.dry_run:
         print(json.dumps(result["tokens"], indent=2))
@@ -293,6 +504,14 @@ def main() -> int:
         tokens_path.write_text(json.dumps(result["tokens"], indent=2) + "\n", encoding="utf-8")
         print(f"[OK] Updated tokens at {tokens_path}")
 
+    print(f"[OK] Extraction method: {extraction['method']}")
+    if extraction.get("candidate_scores"):
+        formatted_scores = ", ".join(f"{key}={value}" for key, value in extraction["candidate_scores"].items())
+        print(f"[INFO] Extraction scores: {formatted_scores}")
+    if extraction.get("fallback_used"):
+        print("[INFO] OCR fallback was used")
+    for warning in extraction.get("warnings", []):
+        print(f"[WARN] {warning}")
     print(f"[OK] Extracted {len(result['palette'])} color(s)")
     if result["applied_color_roles"]:
         print(f"[OK] Applied labeled color roles: {', '.join(result['applied_color_roles'])}")

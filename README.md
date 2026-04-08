@@ -144,7 +144,7 @@ To extract tokens from a brand-guidelines document:
 python scripts/extract_brand_guidelines.py design-assets/raw/brand-guidelines.pdf --tokens specs/tokens/theme-tokens.json
 ```
 
-The extractor updates the standard `colors` and `typography` sections first, then records any extra named brand roles in `colors_additional` and `typography_additional`.
+The extractor defaults to `--mode auto`, which tries native PDF text first and falls back to OCR for scanned or image-heavy PDFs. It updates the standard `colors` and `typography` sections first, then records any extra named brand roles in `colors_additional` and `typography_additional`.
 
 To validate a page spec before implementation:
 

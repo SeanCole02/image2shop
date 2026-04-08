@@ -33,6 +33,7 @@ Treat Framer files and exported mockups as design inputs, not deployable code.
 
 - Run `python scripts/scaffold_workspace.py <target-dir>` to scaffold or normalize a workspace.
 - Run `python scripts/extract_brand_guidelines.py <source> --tokens <theme-tokens-path>` when the user provides a brand-guidelines PDF or text document.
+- Default to `--mode auto` for brand-guidelines PDFs so native text extraction is used first and OCR is used when needed.
 - Run `python scripts/validate_page_spec.py specs/pages/<page-slug>.md --stage <pre-implement|pre-complete>` to enforce intake and UX-review gates.
 - Run `python scripts/update_installed_skill.py` when the user asks to update the installed skill.
 - Add `--page-slug <slug>` to scaffold a page at the same time.

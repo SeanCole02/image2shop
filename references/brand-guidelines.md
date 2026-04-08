@@ -10,6 +10,7 @@ Preferred source location in scaffolded workspaces:
 Use `scripts/extract_brand_guidelines.py` to:
 
 - extract text from a PDF through `pdftotext`
+- fall back to OCR for image-heavy or scanned PDFs when the text extraction is weak
 - find labeled brand colors
 - collect a fallback color palette
 - find heading/body font names when labeled
@@ -23,3 +24,9 @@ After extraction:
 - review the merged tokens
 - rename or add fields when the brand doc defines roles outside the default schema
 - keep the extracted source record in the `brand_guidelines` section of the token file
+
+Extraction modes:
+
+- `--mode auto` tries native PDF text first, then switches to OCR when needed
+- `--mode text` forces native PDF text extraction
+- `--mode ocr` forces OCR
