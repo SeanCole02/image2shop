@@ -19,6 +19,28 @@ Example:
 
 After installation, restart Codex so the new skill is discovered.
 
+## Updating
+
+For non-technical users, the best update path is to ask Codex to use `$image2shop` to update the installed skill in place.
+
+Ask Codex:
+
+- `Use $image2shop to update the installed skill to the latest version and tell me when to restart Codex.`
+
+Why this flow:
+
+- it avoids manual filesystem work
+- it avoids uninstalling the existing skill first
+- it keeps the update flow inside the skill itself
+
+If you want to run the updater directly:
+
+```bash
+python scripts/update_installed_skill.py
+```
+
+After the update, restart Codex.
+
 ## Use With Codex
 
 The normal way to use this repo is to ask Codex to use `$image2shop`.

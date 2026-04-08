@@ -25,6 +25,7 @@ Treat Framer files and exported mockups as design inputs, not deployable code.
 ## Quick Start
 
 - Run `python scripts/scaffold_workspace.py <target-dir>` to scaffold or normalize a workspace.
+- Run `python scripts/update_installed_skill.py` when the user asks to update the installed skill.
 - Add `--page-slug <slug>` to scaffold a page at the same time.
 - Read `references/repo-structure.md` for folder conventions.
 - Read `references/theme-system.md` for shared theme planning.
@@ -49,6 +50,7 @@ Treat Framer files and exported mockups as design inputs, not deployable code.
 ## Bundled Resources
 
 - Use `scripts/scaffold_workspace.py` for deterministic workspace setup.
+- Use `scripts/update_installed_skill.py` to update an installed copy in place.
 - Use `assets/workspace/` for scaffolded repo files.
 - Use `assets/templates/theme-system-template.md` for the shared theme plan.
 - Use `assets/templates/theme-memory-template.md` for persistent theme memory.
