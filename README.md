@@ -27,12 +27,6 @@ Ask Codex:
 
 - `Use $image2shop to update the installed skill to the latest version and tell me when to restart Codex.`
 
-Why this flow:
-
-- it avoids manual filesystem work
-- it avoids uninstalling the existing skill first
-- it keeps the update flow inside the skill itself
-
 If you want to run the updater directly:
 
 ```bash
