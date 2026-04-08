@@ -1,84 +1,89 @@
 # Image2Shop
 
-Image2Shop is an open-source Codex skill for turning Framer pages, screenshots, and static storefront mockups into a structured Shopify Liquid workflow.
-It gives teams a repeatable handoff from design imagery into:
+Image2Shop is an open-source Codex skill for turning Framer pages, screenshots, and storefront mockups into a coherent Shopify Liquid theme workflow.
 
-- shared theme-system planning
-- persistent theme memory
-- page intake specs
-- mockup storage
-- design token capture
-- Shopify theme architecture
-- implementation-ready workspace scaffolding
+Use it when you want to:
 
-## What It Does
+- turn page mockups into Shopify theme work
+- keep pages connected inside one theme system
+- identify reusable components early
+- preserve shared decisions across pages
 
-Image2Shop helps Codex:
+## Get Started
 
-- scaffold a Framer-to-Shopify workspace
-- separate `specs/`, `design-assets/`, and `theme/`
-- define a coherent theme system across pages
-- preserve shared decisions in `THEME_MEMORY.md`
-- identify and promote reusable components early
-- create page intake files and mockup folders
-- ask clarifying questions before implementation
-- map image-based designs into Shopify templates, sections, snippets, and settings
-
-## Repository Layout
-
-- `SKILL.md`: root skill definition
-- `agents/openai.yaml`: UI metadata for the skill
-- `references/`: workflow and mapping guidance
-- `scripts/scaffold_workspace.py`: deterministic workspace scaffold script
-- `assets/templates/`: reusable intake and token templates
-- `assets/workspace/`: starter workspace files emitted by the scaffold script
-
-## Quick Start
-
-Scaffold a workspace:
+1. Clone this repo.
+2. Pick or create a target workspace for your Shopify theme work.
+3. Scaffold the workspace:
 
 ```bash
 python scripts/scaffold_workspace.py <target-dir>
 ```
 
-Scaffold a workspace and first page:
+4. If you already know your first page slug, scaffold that too:
 
 ```bash
 python scripts/scaffold_workspace.py <target-dir> --page-slug homepage
 ```
 
-## Generated Workspace
+5. Put your Framer exports or screenshots into:
+   - `design-assets/mockups/<page-slug>/desktop/`
+   - `design-assets/mockups/<page-slug>/mobile/`
+6. Define the shared storefront in `specs/theme-system.md`.
+7. Record reusable component decisions in `THEME_MEMORY.md`.
+8. Fill out `specs/pages/<page-slug>.md`.
+9. Build the approved Shopify output under `theme/`.
 
-The scaffolded workspace is split into:
+## What Gets Generated
 
-- `specs/` for process docs, page specs, and design tokens
-- `design-assets/` for raw, mockup, and processed design files
+The scaffolded workspace has three main areas:
+
+- `specs/` for theme planning, page specs, and tokens
+- `design-assets/` for raw and reference design files
 - `theme/` for deployable Shopify Liquid output
 
-The shared storefront layer lives in `specs/theme-system.md`.
-Persistent cross-page decisions live in `THEME_MEMORY.md`.
+It also creates:
 
-`THEME_MEMORY.md` separates reusable candidates into:
+- `specs/theme-system.md` for shared storefront structure
+- `THEME_MEMORY.md` for reusable-component memory
 
+## Typical Workflow
+
+1. Define navigation, footer, routes, template families, and shared sections in `specs/theme-system.md`.
+2. Add reusable component candidates to `THEME_MEMORY.md`.
+3. Create or update the page spec for the current page.
+4. Ask clarifying questions before implementation if anything is ambiguous.
+5. Promote components when they are clearly global or reused across pages.
+6. Implement the resulting Liquid sections, snippets, templates, and settings.
+
+## Reusable Component Rules
+
+`THEME_MEMORY.md` tracks:
+
+- approved shared sections
+- approved shared snippets
 - section candidates
 - snippet candidates
 - card candidates
 - layout-pattern candidates
 
-## Intended Workflow
+Promote a candidate:
 
-1. Define the shared storefront structure in `specs/theme-system.md`.
-2. Update `THEME_MEMORY.md` with reusable components and shared decisions.
-3. Promote candidates when they are clearly global or reused across multiple pages.
-4. Export or capture Framer page mockups.
-5. Place them under `design-assets/mockups/<page-slug>/`.
-6. Fill out `specs/pages/<page-slug>.md`.
-7. Record unknowns and ask clarifying questions.
-8. Lock tokens in `specs/tokens/theme-tokens.json`.
-9. Build the approved Shopify output under `theme/`.
+- immediately if it is clearly global
+- after reuse on 2 or more pages with materially matching structure and behavior
+
+Keep it as a candidate if reuse is likely but scope or behavior is still unclear.
+
+## Repository Layout
+
+- `SKILL.md` is the root skill definition
+- `agents/openai.yaml` contains skill UI metadata
+- `references/` contains workflow guidance
+- `scripts/scaffold_workspace.py` scaffolds a working repo
+- `assets/templates/` contains reusable templates
+- `assets/workspace/` contains starter workspace files
 
 ## License
 
 This repository is licensed under `GPL-3.0-or-later`.
 
-See [LICENSE](./LICENSE).
+See [LICENSE](./LICENSE) and [NOTICE](./NOTICE).
