@@ -49,6 +49,11 @@ Implementation guidance:
 - simplify decorative Framer interactions when they are not worth the Shopify complexity cost
 - preserve app compatibility
 - use Shopify objects for products, collections, cart, and customer data instead of static HTML
+- minimize copy and treat long explanatory text as a signal to improve the UI
+- prefer self-descriptive elements and labels over supporting explanation
+- keep header/navigation and footer structure in place for storefront pages unless the user explicitly wants a contained exception
+- reduce unnecessary cards, wrappers, and container nesting
+- allow freer content flow when it stays clear, image-grounded, and concise
 
 QA checklist:
 
@@ -57,6 +62,10 @@ QA checklist:
 - visual parity against the mockup
 - support for the page's primary user task and CTA
 - clear hierarchy, scannability, trust cues, and acceptable interaction friction for that page
+- concise copy and self-descriptive elements
+- restrained use of cards, wrappers, and repeated UI chrome
+- no unnecessary container-in-container composition
+- required header/navigation and footer presence unless intentionally excluded
 - desktop and mobile behavior
 - empty states
 - overflow handling

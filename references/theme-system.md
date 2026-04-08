@@ -18,6 +18,13 @@ Record at least:
 Use `specs/theme-system.md` for this plan.
 Use `THEME_MEMORY.md` for evolving component and implementation memory.
 
+Default assumptions:
+
+- storefront pages should include shared header/navigation and footer structure
+- intentional header/footer exceptions should be documented explicitly per page
+- copy should stay concise, with UI carrying as much meaning as possible
+- element count, card count, and nested container depth should stay restrained unless there is a clear reason not to
+
 Questions to answer early:
 
 - Which pages share the same header and footer?

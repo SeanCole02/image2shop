@@ -14,6 +14,7 @@ PATH_SPLIT_RE = re.compile(r"\s*[;,]\s*")
 PLACEHOLDER_VALUES = {"tbd", "todo", "unknown", "pending", "?"}
 REVIEW_PLACEHOLDER_VALUES = PLACEHOLDER_VALUES | {"n/a", "na", "none"}
 ALLOWED_UX_REVIEW_RESULTS = {"pass", "needs-rework", "fail"}
+ALLOWED_CHROME_DECISIONS = {"shared", "intentional-exception"}
 
 REQUIRED_BY_STAGE = {
     "pre-implement": [
@@ -27,6 +28,8 @@ REQUIRED_BY_STAGE = {
         "Shopify page type",
         "Desktop mockup paths",
         "Mobile mockup paths",
+        "Header/navigation decision",
+        "Footer decision",
         "Shopify data sources",
         "Merchant-editable areas",
         "App constraints",
@@ -50,6 +53,8 @@ REQUIRED_BY_STAGE = {
         "Unknowns",
         "Suggested implementation path",
         "UX review notes",
+        "Copy discipline review",
+        "Layout discipline review",
         "UX review result",
     ],
 }
@@ -141,6 +146,17 @@ def validate_mockup_paths(fields: dict[str, str], spec_path: Path) -> list[str]:
     return errors
 
 
+def validate_chrome_decisions(fields: dict[str, str]) -> list[str]:
+    errors: list[str] = []
+    for label in ("Header/navigation decision", "Footer decision"):
+        value = fields.get(label, "").strip().lower()
+        if value and value not in ALLOWED_CHROME_DECISIONS:
+            errors.append(
+                f"{label} must be one of: " + ", ".join(sorted(ALLOWED_CHROME_DECISIONS))
+            )
+    return errors
+
+
 def validate_ux_review(fields: dict[str, str], stage: str) -> list[str]:
     if stage != "pre-complete":
         return []
@@ -148,6 +164,8 @@ def validate_ux_review(fields: dict[str, str], stage: str) -> list[str]:
     errors: list[str] = []
     review_result = fields.get("UX review result", "").strip().lower()
     review_notes = fields.get("UX review notes", "").strip()
+    copy_review = fields.get("Copy discipline review", "").strip()
+    layout_review = fields.get("Layout discipline review", "").strip()
 
     if review_result and review_result not in ALLOWED_UX_REVIEW_RESULTS:
         errors.append(
@@ -155,6 +173,10 @@ def validate_ux_review(fields: dict[str, str], stage: str) -> list[str]:
         )
     if review_notes and (review_notes.strip().lower() in REVIEW_PLACEHOLDER_VALUES or len(review_notes) < 20):
         errors.append("UX review notes must describe the review outcome in a meaningful sentence")
+    if copy_review and (copy_review.strip().lower() in REVIEW_PLACEHOLDER_VALUES or len(copy_review) < 20):
+        errors.append("Copy discipline review must describe how copy was kept concise and self-descriptive")
+    if layout_review and (layout_review.strip().lower() in REVIEW_PLACEHOLDER_VALUES or len(layout_review) < 20):
+        errors.append("Layout discipline review must describe element density, card usage, or container complexity")
 
     return errors
 
@@ -173,6 +195,7 @@ def main() -> int:
         errors.append(slug_error)
     errors.extend(validate_required_fields(fields, args.stage))
     errors.extend(validate_mockup_paths(fields, spec_path))
+    errors.extend(validate_chrome_decisions(fields))
     errors.extend(validate_ux_review(fields, args.stage))
 
     if errors:

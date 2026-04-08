@@ -23,16 +23,18 @@ Steps:
 6. Record unknowns and ask clarifying questions before implementation.
 7. Mark likely reusable components and add them to `THEME_MEMORY.md`.
 8. Link the page to shared navigation, footer, templates, and reusable sections from `specs/theme-system.md`.
-9. Decide what is static, merchant-editable, or Shopify-data-driven.
-10. Record the page's primary user task, primary CTA, and what a successful UX should feel like for that page.
-11. Run `python scripts/validate_page_spec.py specs/pages/<page-slug>.md --stage pre-implement`.
-12. Only then begin implementation in `theme/`.
+9. Record `Header/navigation decision` and `Footer decision` as `shared` or `intentional-exception`.
+10. Decide what is static, merchant-editable, or Shopify-data-driven.
+11. Record the page's primary user task, primary CTA, and what a successful UX should feel like for that page.
+12. Run `python scripts/validate_page_spec.py specs/pages/<page-slug>.md --stage pre-implement`.
+13. Only then begin implementation in `theme/`.
 
 Minimum completion standard:
 
 - page purpose
 - primary user task and CTA
 - UX success criteria for that page
+- header/navigation and footer decisions
 - Shopify page type
 - desktop and mobile references
 - editable versus fixed content decisions
@@ -44,5 +46,7 @@ Minimum completion standard:
 Completion gate:
 
 - fill in `UX review notes`
+- fill in `Copy discipline review`
+- fill in `Layout discipline review`
 - fill in `UX review result`
 - run `python scripts/validate_page_spec.py specs/pages/<page-slug>.md --stage pre-complete`

@@ -77,7 +77,7 @@ After the workspace is created, the next inputs should go here:
   use a lowercase hyphenated name like `homepage` or `product-detail`
   because the slug names the page spec and the mockup folders
 - page goal and UX review fields:
-  put the page's primary user task, primary CTA, UX success criteria, `UX review notes`, and `UX review result` in `specs/pages/<page-slug>.md`
+  put the page's primary user task, primary CTA, UX success criteria, `Header/navigation decision`, `Footer decision`, `UX review notes`, `Copy discipline review`, `Layout discipline review`, and `UX review result` in `specs/pages/<page-slug>.md`
   because implementation and final review are now gated against those fields
 - desktop and mobile mockups:
   put them in `design-assets/mockups/<page-slug>/desktop/` and `design-assets/mockups/<page-slug>/mobile/`

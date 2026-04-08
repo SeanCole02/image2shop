@@ -26,6 +26,11 @@ Treat Framer files and exported mockups as design inputs, not deployable code.
 - Let the extractor add extra brand-specific token fields when the brand document defines roles beyond the base token schema.
 - Review generated themes for human-focused UX based on the page's actual job, not only visual parity.
 - Check that hierarchy, CTA placement, scannability, trust cues, and interaction friction support the page's feature and user intent.
+- Minimize copy. Long copy is usually a sign that the UI is failing to communicate clearly.
+- Prefer self-descriptive elements so users can understand actions and content without extra explanation.
+- Keep navigation and footer structure mandatory unless the user explicitly defines a contained non-storefront flow.
+- Minimize page elements, cards, and nested containers. Overloaded layouts and container-in-container stacks usually signal poor execution.
+- Prefer freeform content flow when it reads clearly, is grounded by imagery, and uses short copy effectively.
 - Run `python scripts/validate_page_spec.py specs/pages/<page-slug>.md --stage pre-implement` before implementation starts.
 - Run `python scripts/validate_page_spec.py specs/pages/<page-slug>.md --stage pre-complete` before treating a page as complete.
 
@@ -60,8 +65,8 @@ Treat Framer files and exported mockups as design inputs, not deployable code.
 13. Run `python scripts/validate_page_spec.py specs/pages/<page-slug>.md --stage pre-implement`.
 14. Link the page back to shared navigation, footer, templates, and reusable section inventory.
 15. Implement the approved output in `theme/`.
-16. Review visual parity, responsive behavior, merchant editability, and whether the UI/UX serves the page's primary human goal.
-17. Record `UX review notes` and `UX review result` in the page spec, using `pass`, `needs-rework`, or `fail` for the result.
+16. Review visual parity, responsive behavior, merchant editability, and whether the UI/UX serves the page's primary human goal without relying on excess copy, redundant elements, or unnecessary container nesting.
+17. Record `UX review notes`, `Copy discipline review`, `Layout discipline review`, and `UX review result` in the page spec, using `pass`, `needs-rework`, or `fail` for the result.
 18. Run `python scripts/validate_page_spec.py specs/pages/<page-slug>.md --stage pre-complete`.
 
 ## Bundled Resources

@@ -19,6 +19,8 @@
 `Interaction notes path:`
 `Reusable component candidates:`
 `Shared navigation/footer impact:`
+`Header/navigation decision:`
+`Footer decision:`
 `Shared sections referenced:`
 `Shared snippets referenced:`
 `Route connections:`
@@ -30,6 +32,9 @@
 `Unknowns:`
 `Suggested implementation path:`
 `UX review notes:`
+`Copy discipline review:`
+`Layout discipline review:`
 `UX review result:`
 
 Use `pass`, `needs-rework`, or `fail` for `UX review result`.
+Use `shared` or `intentional-exception` for `Header/navigation decision` and `Footer decision`.
