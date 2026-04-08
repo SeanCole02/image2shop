@@ -1,0 +1,4 @@
+interface:
+  display_name: "Image2Shop"
+  short_description: "Turn mockups into Shopify themes"
+  default_prompt: "Use $image2shop to turn these mockups into a Shopify Liquid workflow."

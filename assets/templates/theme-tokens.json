@@ -1,0 +1,46 @@
+{
+  "meta": {
+    "name": "theme-tokens",
+    "version": "0.1.0",
+    "notes": [
+      "Use this file as the canonical design-token source when translating Framer designs into Shopify theme code.",
+      "Ask for clarification before locking values that are missing or ambiguous in the design."
+    ]
+  },
+  "colors": {
+    "brand_primary": "#111111",
+    "brand_secondary": "#F5F5F5",
+    "accent": "#D4AF37",
+    "text_primary": "#111111",
+    "text_inverse": "#FFFFFF",
+    "surface_primary": "#FFFFFF",
+    "surface_secondary": "#F7F7F7",
+    "border_default": "#E5E5E5",
+    "success": "#1F8F4E",
+    "warning": "#B7791F",
+    "error": "#C53030"
+  },
+  "typography": {
+    "font_heading": "Replace with approved heading font",
+    "font_body": "Replace with approved body font",
+    "base_font_size_px": 16
+  },
+  "spacing": {
+    "section_gap_px": 80,
+    "container_padding_px": 24,
+    "grid_gap_px": 24
+  },
+  "radius": {
+    "card_px": 16,
+    "button_px": 999
+  },
+  "layout": {
+    "container_max_width_px": 1280,
+    "content_max_width_px": 960
+  },
+  "motion": {
+    "duration_fast_ms": 180,
+    "duration_base_ms": 280,
+    "easing_standard": "cubic-bezier(0.2, 0.8, 0.2, 1)"
+  }
+}
